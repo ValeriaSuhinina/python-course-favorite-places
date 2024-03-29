@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query,Request, status
+
+import geocoder
+from geocoder.ipinfo import IpinfoQuery
 
 from exceptions import ApiHTTPException, ObjectNotFoundException
 from models.places import Place
@@ -128,22 +131,35 @@ async def delete(primary_key: int, places_service: PlacesService = Depends()) ->
 
 
 @router.post(
-    "",
+    "/auto_coordinates",
     summary="Создание нового объекта с автоматическим определением координат",
     response_model=PlaceResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_auto() -> PlaceResponse:
+async def create_auto(
+    description:  str = Query(None),
+    places_service: PlacesService = Depends(),
+) -> PlaceResponse:
     """
     Создание нового объекта любимого места с автоматическим определением координат.
 
     :return:
     """
 
-    # Пример:
-    #
-    # import geocoder
-    # from geocoder.ipinfo import IpinfoQuery
-    #
-    # g: IpinfoQuery = geocoder.ip('me')
-    # print(g.latlng)
+    geo_info: IpinfoQuery = geocoder.ip("me")
+
+    if geo_info.latlng:
+        latitude, longitude = geo_info.latlng
+        place = Place(
+            description=description,
+            longitude=longitude,
+            latitude=latitude,
+        )
+
+        if primary_key := await places_service.create_place(place):
+            return PlaceResponse(data=await places_service.get_place(primary_key))
+
+    raise ApiHTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail="Не удалось создать объект",
+    )
