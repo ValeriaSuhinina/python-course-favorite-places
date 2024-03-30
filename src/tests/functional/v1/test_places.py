@@ -136,9 +136,9 @@ class TestPlacesGetMethod:
         assert item["latitude"] == request_body["latitude"]
         assert item["longitude"] == request_body["longitude"]
         assert item["description"] == request_body["description"]
-        assert item["country"] == None
-        assert item["city"] == None
-        assert item["locality"] == None
+        assert item["country"] is None
+        assert item["city"] is None
+        assert item["locality"] is None
 
         assert "total" in response_json
         assert isinstance(response_json["total"], int)
