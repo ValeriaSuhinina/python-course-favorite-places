@@ -109,7 +109,7 @@ class BaseRepository(ABC):
         values = (
             model
             if isinstance(model, dict)
-            else model.dict(exclude={"id"}, exclude_none=True)
+            else model.model_dump(exclude={"id"}, exclude_none=True)
         )
         cursor: Result = await self.session.execute(
             insert(self.model).values(**values).returning(self.get_attr("id"))

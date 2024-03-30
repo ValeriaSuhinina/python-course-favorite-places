@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, Query,Request, status
-
 import geocoder
+from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi_pagination import Page, paginate
 from geocoder.ipinfo import IpinfoQuery
 
 from exceptions import ApiHTTPException, ObjectNotFoundException
@@ -8,7 +8,6 @@ from models.places import Place
 from schemas.places import PlaceResponse, PlaceUpdate
 from schemas.routes import MetadataTag
 from services.places_service import PlacesService
-from fastapi_pagination import Page, paginate
 
 router = APIRouter()
 
@@ -137,7 +136,7 @@ async def delete(primary_key: int, places_service: PlacesService = Depends()) ->
     status_code=status.HTTP_201_CREATED,
 )
 async def create_auto(
-    description:  str = Query(None),
+    description: str = Query(None),
     places_service: PlacesService = Depends(),
 ) -> PlaceResponse:
     """

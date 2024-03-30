@@ -108,7 +108,7 @@ class PlacesService:
         )
 
         if location := await LocationClient().get_location(
-                latitude=place.latitude, longitude=place.longitude
+            latitude=place.latitude, longitude=place.longitude
         ):
             updated_place.country = location.alpha2code
             updated_place.city = location.city
